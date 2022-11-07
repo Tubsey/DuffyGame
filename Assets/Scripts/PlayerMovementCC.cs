@@ -13,7 +13,10 @@ public class PlayerMovementCC : MonoBehaviour
     float maxSpeedX = 5;
     [SerializeField]
     float stopTime = 0.2f;
-
+    //Testing for source control purposes
+    [Tooltip("No effect on script")]
+    [SerializeField]
+    float testVariable;
     //Variables for amount of jumps and how big the jump is.
     [Header("Jumping")]
     [SerializeField]
