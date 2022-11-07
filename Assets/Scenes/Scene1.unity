@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 705507994}
-  m_IndirectSpecularColor: {r: 0.44657874, g: 0.49641275, b: 0.5748172, a: 1}
+  m_IndirectSpecularColor: {r: 0.44657874, g: 0.49641258, b: 0.5748172, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -2105,8 +2105,20 @@ PrefabInstance:
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 570992827, guid: b5d18a69332f3ce4296fcebf613f87b0, type: 3}
+      propertyPath: stopTime
+      value: 0.35
+      objectReference: {fileID: 0}
+    - target: {fileID: 570992827, guid: b5d18a69332f3ce4296fcebf613f87b0, type: 3}
       propertyPath: jumpForce
       value: 20
+      objectReference: {fileID: 0}
+    - target: {fileID: 570992827, guid: b5d18a69332f3ce4296fcebf613f87b0, type: 3}
+      propertyPath: maxSpeedX
+      value: 12
+      objectReference: {fileID: 0}
+    - target: {fileID: 570992827, guid: b5d18a69332f3ce4296fcebf613f87b0, type: 3}
+      propertyPath: movementAcceleration
+      value: 25
       objectReference: {fileID: 0}
     - target: {fileID: 570992832, guid: b5d18a69332f3ce4296fcebf613f87b0, type: 3}
       propertyPath: m_IsKinematic
