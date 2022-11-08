@@ -24,26 +24,57 @@ public class PlayerMovementCC : MonoBehaviour
     [Header("Other")]
     [SerializeField]
     float gravityAcceleration = -9.81f;
-
+    //sets key for reverse gravity
+    [SerializeField]
+    KeyCode reverseGravityButton = KeyCode.R;
 
     //variables for the player state
     private int jumpCount = 0;
     private Vector2 currentVelocity = new Vector2();
     private Vector2 currentAcceleration = new Vector2();
+    private float forwardRotation = 0;
+    private float backwardRotation = 180;
+    private float uprightRotation = 0;
+    private float defaultGroundedGravity = -1f;
+    private bool isReversed = false;
 
     //character controller reference
     private CharacterController cc;
+    private GroundCheck gc;
+    private HeadCheck hc;
 
     private void Start() 
     {
         cc = GetComponent<CharacterController>();
+        gc = GetComponentInChildren<GroundCheck>();
+        if (!gc)
+        {
+            Debug.LogError("No Groundcheck detected");
+        }
+        hc = GetComponentInChildren<HeadCheck>();
+        if (!hc)
+        {
+            Debug.LogError("No Headcheck detected");
+        }
     }
     private void Update()
     {
+        print(gc.IsGrounded);
+        if (Input.GetKeyDown(reverseGravityButton)) 
+        {
+            ReverseGravity();
+        }
         float horizontalInput = Input.GetAxis("Horizontal");
-
+        if (horizontalInput < 0)
+        {
+            transform.eulerAngles = new Vector3(0, backwardRotation, uprightRotation);
+        }
+        else 
+        {
+            transform.eulerAngles = new Vector3(0, forwardRotation, uprightRotation);
+        }
         //resets jumpcount when player touches ground
-        if (cc.isGrounded)
+        if (gc.IsGrounded)
         {
             ResetJumps();
         }
@@ -52,7 +83,7 @@ public class PlayerMovementCC : MonoBehaviour
         currentAcceleration = new Vector2(horizontalInput * movementAcceleration, gravityAcceleration);
        
         //Sets gravity to 0 if the player is grounded, this prevents the player from falling super fast if they are on a platform
-        if (cc.isGrounded) currentAcceleration.y = 0;
+        if (gc.IsGrounded) currentAcceleration.y = -1;
 
         //Adds acceleration to the velocity so the player increases or decreases speed over time.
         //Then it clamps the speed to confine it within the max speed.
@@ -105,7 +136,9 @@ public class PlayerMovementCC : MonoBehaviour
             currentAcceleration.x = 0;
             currentVelocity.x = 0;
         }
-        if ((cc.collisionFlags & CollisionFlags.Above) != 0 && currentVelocity.y > 0)
+        print("Head Touched: " + hc.IsHeadTouched);
+        print ("Velocity toward head more than 0: " + (isReversed ? currentVelocity.y < 0 : currentVelocity.y > 0));
+        if (hc.IsHeadTouched && (isReversed ? currentVelocity.y < 0 : currentVelocity.y > 0))
         {
             //If the player jumps and hits a ceiling, the velocity resets to zero.
             //This is for preventing the player from floating because the velocity is still pushing them upwards.
@@ -116,7 +149,7 @@ public class PlayerMovementCC : MonoBehaviour
     private void Jump() 
     {
         //Sets upward/downward velocity to 0 so that the jump will always have the same height.
-        currentVelocity.y = 0;
+        currentVelocity.y = 0f;
 
         //Adds the velocity so that the player jumps
         currentVelocity += new Vector2(0, jumpForce);
@@ -128,4 +161,19 @@ public class PlayerMovementCC : MonoBehaviour
     {
         jumpCount = 0;
     }
+
+    //reverses all necessary variables, and changes rotation values, so that the player can successfully move upside down
+    private void ReverseGravity()
+    {
+        isReversed = !isReversed;
+        //currentVelocity.y = 0;
+        gravityAcceleration = -gravityAcceleration;
+        jumpForce = -jumpForce;
+        defaultGroundedGravity = -defaultGroundedGravity;
+        float x = forwardRotation;
+        forwardRotation = backwardRotation;
+        backwardRotation = x;
+        if (uprightRotation == 0) uprightRotation = 180;
+        else uprightRotation = 0;
+    } 
 }
