@@ -58,8 +58,8 @@
   <ItemGroup>
     <Compile Include="Assets\Scripts\PlayerMovementCC.cs" />
     <Compile Include="Assets\Scripts\PlatformMover.cs" />
-    <Compile Include="Assets\Scripts\GroundCheck.cs" />
     <Compile Include="Assets\Scripts\HeadCheck.cs" />
+    <Compile Include="Assets\Scripts\GroundCheck.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">

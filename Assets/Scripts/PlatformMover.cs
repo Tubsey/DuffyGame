@@ -16,19 +16,20 @@ public class PlatformMover : MonoBehaviour
         transform.position = pts[startPt].position;
     }
 
-    void Update()
+    void FixedUpdate()
     {
         MovePlatform();
     }
 
-    void OnCollisionEnter(Collision col)
+    void OnTriggerEnter(Collider col)
     {
-        col.transform.SetParent(transform);
+        if (!col.CompareTag("PlayerFeet")) return;
+        col.transform.GetComponentInParent<PlayerMovementCC>().SetParentObject(transform);
     }
-
-    void OnCollisionExit(Collision col)
+    void OnTriggerExit(Collider col)
     {
-        col.transform.SetParent(null);
+        if (!col.CompareTag("PlayerFeet")) return;
+        col.transform.GetComponentInParent<PlayerMovementCC>().SetParentObject(null);
     }
 
     void MovePlatform()

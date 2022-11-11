@@ -59,7 +59,6 @@ public class PlayerMovementCC : MonoBehaviour
     }
     private void Update()
     {
-        print(gc.IsGrounded);
         if (Input.GetKeyDown(reverseGravityButton)) 
         {
             ReverseGravity();
@@ -175,5 +174,11 @@ public class PlayerMovementCC : MonoBehaviour
         backwardRotation = x;
         if (uprightRotation == 0) uprightRotation = 180;
         else uprightRotation = 0;
-    } 
+    }
+
+    //
+    public void SetParentObject(Transform parentObject) 
+    {
+        transform.SetParent(parentObject);
+    }
 }
