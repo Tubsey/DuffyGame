@@ -68,7 +68,7 @@ public class PlayerMovementCC : MonoBehaviour
         {
             transform.eulerAngles = new Vector3(0, backwardRotation, uprightRotation);
         }
-        else 
+        else if (horizontalInput > 0)
         {
             transform.eulerAngles = new Vector3(0, forwardRotation, uprightRotation);
         }
@@ -174,6 +174,8 @@ public class PlayerMovementCC : MonoBehaviour
         backwardRotation = x;
         if (uprightRotation == 0) uprightRotation = 180;
         else uprightRotation = 0;
+
+        transform.eulerAngles = new Vector3(0, transform.eulerAngles.y + 180, uprightRotation);
     }
 
     //
