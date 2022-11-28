@@ -5,6 +5,19 @@ using UnityEngine;
 [RequireComponent(typeof(CharacterController))]
 public class PlayerMovementCC : MonoBehaviour
 {
+    [System.Serializable]
+    public enum MovementMode
+    {
+        IdleLeft, IdleRight, MoveRight, MoveLeft
+    }
+
+    [System.Serializable]
+    struct AnimationMode
+    {
+        [Tooltip("Uses the move mode to determine which animation is used at the right time. Only use each Move Mode once")]
+        public MovementMode associatedMoveMode;
+        public RuntimeAnimatorController anim;
+    }
     //Variables for how the player starts moving, stops moving, and how fast they can go.
     [Header("Movement")]
     [SerializeField]
@@ -18,7 +31,7 @@ public class PlayerMovementCC : MonoBehaviour
     [SerializeField]
     float jumpForce = 10;
     [SerializeField]
-    int jumpMax = 3; 
+    int jumpMax = 3;
 
     //sets strength of gravity
     [Header("Other")]
@@ -27,6 +40,9 @@ public class PlayerMovementCC : MonoBehaviour
     //sets key for reverse gravity
     [SerializeField]
     KeyCode reverseGravityButton = KeyCode.R;
+
+    [SerializeField]
+    AnimationMode[] animationModes = null;
 
     //variables for the player state
     private int jumpCount = 0;
@@ -38,23 +54,41 @@ public class PlayerMovementCC : MonoBehaviour
     private float defaultGroundedGravity = -1f;
     private bool isReversed = false;
 
-    //character controller reference
+    //Animation stuff
+    private Dictionary<MovementMode, RuntimeAnimatorController> animationTable = new Dictionary<MovementMode, RuntimeAnimatorController>();
+
+    //references
     private CharacterController cc;
     private GroundCheck gc;
     private HeadCheck hc;
+    private Animator animator;
 
+
+    private void Awake()
+    {
+        foreach (AnimationMode animMode in animationModes) 
+        {
+            if (animationTable.ContainsKey(animMode.associatedMoveMode)) continue;
+            animationTable.Add(animMode.associatedMoveMode, animMode.anim);
+        }
+    }
     private void Start() 
     {
         cc = GetComponent<CharacterController>();
         gc = GetComponentInChildren<GroundCheck>();
+        animator = GetComponentInChildren<Animator>();
         if (!gc)
         {
-            Debug.LogError("No Groundcheck detected");
+            Debug.LogError("No Groundcheck detected on player");
         }
         hc = GetComponentInChildren<HeadCheck>();
         if (!hc)
         {
-            Debug.LogError("No Headcheck detected");
+            Debug.LogError("No Headcheck detected on player");
+        }
+        if (!animator)
+        {
+            Debug.LogError("No Animator detected on player");
         }
     }
     private void Update()
@@ -64,13 +98,25 @@ public class PlayerMovementCC : MonoBehaviour
             ReverseGravity();
         }
         float horizontalInput = Input.GetAxis("Horizontal");
+        transform.eulerAngles = new Vector3(0, 0, uprightRotation);
+        // TODO: Switch rotation with animations
         if (horizontalInput < 0)
         {
-            transform.eulerAngles = new Vector3(0, backwardRotation, uprightRotation);
+            if (!animationTable.ContainsKey(MovementMode.MoveLeft)) return;
+            //transform.eulerAngles = new Vector3(0, backwardRotation, uprightRotation);
+            animator.runtimeAnimatorController = animationTable[MovementMode.MoveLeft];
+
         }
         else if (horizontalInput > 0)
         {
-            transform.eulerAngles = new Vector3(0, forwardRotation, uprightRotation);
+            if (!animationTable.ContainsKey(MovementMode.MoveRight)) return;
+            //transform.eulerAngles = new Vector3(0, forwardRotation, uprightRotation);
+            animator.runtimeAnimatorController = animationTable[MovementMode.MoveRight];
+        }
+        else 
+        {
+            if (!animationTable.ContainsKey(MovementMode.IdleRight)) return;
+            animator.runtimeAnimatorController = animationTable[MovementMode.IdleRight];
         }
         //resets jumpcount when player touches ground
         if (gc.IsGrounded)
